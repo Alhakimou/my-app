@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Graphique amélioré — Barres & Camembert</title>
+<style>
+  :root{--bg:#f6f8fb;--card:#fff;--accent:#2563eb;--muted:#6b7280}
+  *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+  body{margin:0;background:var(--bg);color:#111;padding:24px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  h1{font-size:20px;margin:0}
+  .grid{display:grid;grid-template-columns:1fr 480px;gap:18px}
+  .card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+  form .row{display:flex;gap:8px;margin-bottom:8px}
+  input[type=text], input[type=number], select{flex:1;padding:10px;border-radius:8px;border:1px solid #e6e9ef}
+  input[type=number]{max-width:160px}
+  button{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+  .list{margin-top:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;text-align:left;border-bottom:1px solid #f1f4f8}
+  .actions{display:flex;gap:8px}
+  canvas{width:100%;height:360px;background:linear-gradient(180deg,#fff,#fbfdff);border-radius:8px}
+  .helper{color:var(--muted);font-size:13px;margin-top:8px}
+  .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .small{font-size:13px;padding:8px 10px}
+  .msg{font-size:13px;color:green;margin-top:10px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}canvas{height:260px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Formulaire & Graphiques — Barres & Camembert</h1>
+<div class="helper">Ajoute produits avec unité puis génère graphiques. Les noms et valeurs s'affichent sur les barres et camembert.</div>
+</header>
+
+<div class="grid">
+<section class="card">
+<form id="product-form" autocomplete="off">
+<div class="row">
+<input id="product-name" type="text" placeholder="Nom du produit" required />
+<input id="product-qty" type="number" placeholder="Quantité" min="0" step="1" required />
+<select id="product-unit" required>
+<option value="kg">kg</option>
+<option value="tonne">tonne</option>
+<option value="USD">USD</option>
+<option value="Euro">Euro</option>
+<option value="FCFA">FCFA</option>
+<option value="Yen">Yen</option>
+<option value="Yuan">Yuan</option>
+<option value="mètre">mètre</option>
+</select>
+<button type="submit">Ajouter</button>
+</div>
+</form>
+
+<div class="list card" style="margin-top:8px;padding:12px;">
+<strong>Liste des produits</strong>
+<div style="overflow:auto;max-height:220px;margin-top:8px;">
+<table id="items-table">
+<thead><tr><th>Produit</th><th>Quantité</th><th>Unité</th><th style="width:90px">Actions</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+<div class="controls">
+<button id="draw-btn" class="small">Générer graphiques</button>
+<button id="clear-btn" class="small ghost">Effacer tout</button>
+<select id="sort-select" class="small">
+<option value="none">Trier: Aucun</option>
+<option value="name-asc">Nom ↑</option>
+<option value="name-desc">Nom ↓</option>
+<option value="qty-desc">Quantité ↓</option>
+<option value="qty-asc">Quantité ↑</option>
+</select>
+<button id="export-btn" class="small">Exporter image</button>
+</div>
+<div id="message" class="msg" style="display:none"></div>
+</div>
+</section>
+
+<aside class="card">
+<strong>Graphiques</strong>
+<canvas id="chart-canvas"></canvas>
+<div class="helper">Survolez barres ou secteurs pour voir valeurs. Cliquez barre pour supprimer.</div>
+</aside>
+</div>
+</div>
+
+<script>
+const items=[];
+const form=document.getElementById('product-form');
+const nameInput=document.getElementById('product-name');
+const qtyInput=document.getElementById('product-qty');
+const unitSelect=document.getElementById('product-unit');
+const tbody=document.querySelector('#items-table tbody');
+const drawBtn=document.getElementById('draw-btn');
+const clearBtn=document.getElementById('clear-btn');
+const sortSelect=document.getElementById('sort-select');
+const exportBtn=document.getElementById('export-btn');
+const msg=document.getElementById('message');
+const canvas=document.getElementById('chart-canvas');
+const ctx=canvas.getContext('2d');
+
+function showMessage(text,duration=2000){msg.textContent=text; msg.style.display='block'; setTimeout(()=>msg.style.display='none',duration);}
+function uniqueColor(seed){let h=0; for(let i=0;i<seed.length;i++) h=(h*31 + seed.charCodeAt(i))%360; return `hsl(${h} 70% 60%)`; }
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+
+function renderTable(){
+  tbody.innerHTML='';
+  items.forEach((it,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${escapeHtml(it.name)}</td><td>${it.qty}</td><td>${it.unit}</td>
+    <td class="actions"><button data-idx="${idx}" class="ghost small">Suppr</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function addItem(name,qty,unit){
+  const existing = items.find(i=>i.name.toLowerCase()===name.toLowerCase());
+  if(existing){ existing.qty+=qty; existing.unit=unit; }
+  else items.push({name,qty,unit});
+  renderTable();
+}
+
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=nameInput.value.trim();
+  const qty=Number(qtyInput.value);
+  const unit=unitSelect.value;
+  if(!name||isNaN(qty)||qty<0){showMessage('Nom invalide ou quantité négative');return;}
+  addItem(name,Math.floor(qty),unit);
+  nameInput.value=''; qtyInput.value=''; nameInput.focus();
+  drawChart();
+  showMessage('Produit ajouté');
+});
+
+tbody.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  const idx=Number(b.dataset.idx); if(!Number.isFinite(idx)) return;
+  items.splice(idx,1); renderTable(); drawChart();
+});
+
+clearBtn.addEventListener('click',()=>{if(!confirm('Effacer tous les produits ?')) return; items.length=0; renderTable(); drawChart();});
+
+sortSelect.addEventListener('change',()=>{
+  const v=sortSelect.value;
+  if(v==='name-asc') items.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(v==='name-desc') items.sort((a,b)=>b.name.localeCompare(a.name));
+  else if(v==='qty-desc') items.sort((a,b)=>b.qty-b.qty?b.qty-a.qty:a.name.localeCompare(b.name));
+  else if(v==='qty-asc') items.sort((a,b)=>a.qty-b.qty||a.name.localeCompare(b.name));
+  renderTable();
+});
+
+drawBtn.addEventListener('click',()=>drawChart());
+exportBtn.addEventListener('click',()=>{
+  const dataUrl=canvas.toDataURL('image/png');
+  const a=document.createElement('a'); a.href=dataUrl; a.download='graphique.png'; document.body.appendChild(a); a.click(); a.remove();
+});
+
+const tooltip=document.createElement('div');
+tooltip.style.position='absolute'; tooltip.style.padding='6px 8px';
+tooltip.style.background='rgba(0,0,0,0.75)'; tooltip.style.color='white';
+tooltip.style.borderRadius='6px'; tooltip.style.fontSize='13px';
+tooltip.style.pointerEvents='none'; tooltip.style.display='none';
+document.body.appendChild(tooltip);
+function getCanvasOffset(el){ const r=el.getBoundingClientRect(); return {left:r.left,top:r.top}; }
+
+canvas.addEventListener('mousemove', e=>{
+  const rect=getCanvasOffset(canvas);
+  const x=(e.clientX-rect.left)*window.devicePixelRatio;
+  const y=(e.clientY-rect.top)*window.devicePixelRatio;
+  const bars=canvas._barRects||[];
+  const hit=bars.find(b=>x>=b.x && x<=b.x+b.w && y>=b.y && y<=b.y+b.h);
+  if(hit){ tooltip.style.display='block'; tooltip.textContent=`${items[hit.index].name} — ${items[hit.index].qty} ${items[hit.index].unit}`;
+    tooltip.style.left=(e.clientX+10)+'px'; tooltip.style.top=(e.clientY+10)+'px'; }
+  else tooltip.style.display='none';
+});
+
+canvas.addEventListener('click', e=>{
+  const rect=getCanvasOffset(canvas);
+  const x=(e.clientX-rect.left)*window.devicePixelRatio;
+  const y=(e.clientY-rect.top)*window.devicePixelRatio;
+  const bars=canvas._barRects||[];
+  const hit=bars.find(b=>x>=b.x && x<=b.x+b.w && y>=b.y && y<=b.y+b.h);
+  if(hit){ if(confirm(`Supprimer le produit "${items[hit.index].name}" ?`)){items.splice(hit.index,1); renderTable(); drawChart();} }
+});
+
+let resizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>drawChart(),120);});
+
+function drawChart(){
+  const W=canvas.width=canvas.clientWidth*window.devicePixelRatio;
+  const H=canvas.height=canvas.clientHeight*window.devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+  if(items.length===0){ ctx.save(); ctx.scale(window.devicePixelRatio,window.devicePixelRatio); ctx.fillStyle='#374151'; ctx.font='16px system-ui'; ctx.fillText('Ajoutez des produits puis cliquez sur "Générer graphiques".',10,30); ctx.restore(); return; }
+
+  const labels=items.map(i=>i.name);
+  const values=items.map(i=>i.qty);
+  const units=items.map(i=>i.unit);
+  const max=Math.max(...values,1);
+
+  const padding=48*window.devicePixelRatio;
+  const left=70*window.devicePixelRatio;
+  const top=30*window.devicePixelRatio;
+  const bottom=50*window.devicePixelRatio;
+  const chartW=W-left-padding;
+  const chartH=H-top-bottom;
+
+  // --- Barres ---
+  ctx.save(); ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.fillRect(left/window.devicePixelRatio,top/window.devicePixelRatio,chartW/window.devicePixelRatio,chartH/window.devicePixelRatio);
+  ctx.restore();
+
+  const barCount=values.length;
+  const gap=14*window.devicePixelRatio;
+  const totalGap=gap*(barCount+1);
+  const barW=Math.max(16*window.devicePixelRatio,(chartW-totalGap)/barCount);
+  const barRects=[];
+  values.forEach((v,i)=>{
+    const x=left+gap+i*(barW+gap);
+    const height=(v/max)*(chartH-8*window.devicePixelRatio);
+    const y=top+chartH-height;
+    const color=uniqueColor(labels[i]);
+    ctx.fillStyle=color; ctx.fillRect(x,y,barW,height);
+    ctx.save(); ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+    ctx.fillStyle='#111'; ctx.font='12px system-ui';
+    const valText=`${labels[i]}: ${v} ${units[i]}`; // <-- nom + valeur + unité
+    ctx.fillText(valText,(x+barW/2)/window.devicePixelRatio - ctx.measureText(valText).width/2,(y/window.devicePixelRatio)-4);
+    ctx.restore();
+    barRects.push({x,y,w:barW,h:height,index:i,value:v});
+  });
+  canvas._barRects=barRects;
+  canvas._labels=labels;
+
+  // axes
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1*window.devicePixelRatio;
+  ctx.beginPath(); ctx.moveTo(left,top+chartH); ctx.lineTo(left+chartW,top+chartH); ctx.stroke();
+
+  // --- Camembert ---
+  const pieRadius=Math.min(chartW,chartH)/4;
+  const cx=left+chartW+pieRadius+20;
+  const cy=top+chartH/2;
+  let startAngle=-Math.PI/2;
+  const total=values.reduce((a,b)=>a+b,0);
+  values.forEach((v,i)=>{
+    const sliceAngle=(v/total)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,pieRadius,startAngle,startAngle+sliceAngle);
+    ctx.closePath(); ctx.fillStyle=uniqueColor(labels[i]); ctx.fill();
+
+    // texte central ou externe
+    const midAngle=startAngle+sliceAngle/2;
+    const tx=cx+(pieRadius/1.3)*Math.cos(midAngle);
+    const ty=cy+(pieRadius/1.3)*Math.sin(midAngle);
+    ctx.save(); ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+    ctx.fillStyle='#111'; ctx.font='12px system-ui';
+    const text=`${labels[i]}: ${v} ${units[i]}`;
+    const textWidth=ctx.measureText(text).width;
+    if(textWidth < pieRadius*1.5){ // texte interne
+      ctx.fillText(text,tx/window.devicePixelRatio - textWidth/2,ty/window.devicePixelRatio);
+    } else { // texte externe avec ligne
+      const extX=cx+(pieRadius+20)*Math.cos(midAngle);
+      const extY=cy+(pieRadius+20)*Math.sin(midAngle);
+      ctx.beginPath(); ctx.moveTo(cx+pieRadius*Math.cos(midAngle),cy+pieRadius*Math.sin(midAngle)); 
+      ctx.lineTo(extX,extY); ctx.strokeStyle='#111'; ctx.stroke();
+      ctx.fillText(text,extX/window.devicePixelRatio - ctx.measureText(text).width/2,extY/window.devicePixelRatio);
+    }
+    ctx.restore();
+    startAngle+=sliceAngle;
+  });
+}
+
+drawChart();
+</script>
+</body>
+</html>
