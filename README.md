@@ -1,5 +1,6 @@
 English_French
 It is a module that works well; just copy and paste. It allows you to translate a speech from English to French text continuously.
+Remarque Anglais_to_french1 is more advanced than Anglais_to_french
 ..................................................................
 ...................................................................
 
@@ -12,6 +13,7 @@ Translate in french
 Anglais_Français 
 est un module qui marche bien juste copie coller qui permet de 
 traduire un discours depuis anglais vers text en français de façon continue.
+Remarque Anglais_to_french1 est plus avancé 
 ..................................................................
 ...................................................................
 Credit_System 
