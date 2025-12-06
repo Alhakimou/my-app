@@ -1,4 +1,5 @@
-English_French It is a module that works well; just copy and paste. It allows you to translate a speech from English to French text continuously. .................................................................. ...................................................................
+English_French It is a module that works well; just copy and paste. It allows you to translate a speech from English to French text continuously. 
+Remarque Anglais_to_french1 is more advanced .................................................................. ...................................................................
 
 Credit_System It is a Python module that allows you to calculate your payment when you take a loan with an interest rate over several years. This module works well; just copy and paste.
 
