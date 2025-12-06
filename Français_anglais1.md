@@ -1,0 +1,6 @@
+ Français_anglais1 is advanced conversation from french speak to english text just
+you need to cvopy and paste the code on your python 
+.....................................................
+....................................................
+C’est une conversation avancée qui permet de passer du français parlé au texte en anglais.
+Il vous suffit de copier et coller le code dans votre Python.
