@@ -20,7 +20,9 @@ Credit_System
 Est un module en python qui permet de prevoir votre payement 
 lorsque vous prenez un credit avec taut d'interet sur des années
 ce module marche bien juste copie coller
+..................................................................
+...................................................................
 
 Test_thread
-Tesat_thread.py is python code help you to run your first thread just copy and paste The thread allow to create a lot of functions which run parallel not by sequence.
+Test_thread.py is python code help you to run your first thread just copy and paste The thread allow to create a lot of functions which run parallel not by sequence.
 The thread is the base of parrallelism programming please run this code which run three functions it is work.
