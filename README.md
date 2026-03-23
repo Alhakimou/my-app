@@ -26,3 +26,11 @@ ce module marche bien juste copie coller
 Test_thread
 Test_thread.py is python code help you to run your first thread just copy and paste The thread allow to create a lot of functions which run parallel not by sequence.
 The thread is the base of parrallelism programming please run this code which run three functions it is work.
+
+Project: Discrete Data Mapping & Transformation
+
+Objective: Implement a bijective mapping between a character space and a discrete numerical space.
+Significance: This demonstrates the fundamental logic of data encoding and preprocessing, which are essential steps before feeding categorical data into statistical models or neural networks (like Word Embeddings).
+Features: Symmetric encoding/decoding, O(1) lookup complexity using hash maps (dictionaries).
+
+
