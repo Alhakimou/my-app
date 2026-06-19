@@ -5,4 +5,4 @@ with sr.Microphone() as source:
     print("Parlez maintenant...")
     audio = r.listen(source)
     texte = r.recognize_google(audio, language="fr-FR")
-    print("Vous avez dit :", texte)
+    print("Vous avez dit or you said :", texte)
