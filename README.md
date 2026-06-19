@@ -179,3 +179,63 @@ python converter.py
 
 
 
+
+
+
+Speech-to-test.py is a program which translate to text when you speak  to do that you need to do
+
+
+# Simple Speech-to-Text (Python)
+
+A minimalist Python script that captures real-time audio from your microphone and converts it into written text using the Google Speech Recognition API. This implementation is pre-configured to accurately recognize and transcribe the French language (`fr-FR`).
+
+## Features
+
+* **Real-time Audio Capture**: Leverages the system microphone to listen for active voice input.
+* **Cloud-based Processing**: Uses Google's robust web API for instant and highly accurate transcriptions without requiring local heavy machine learning models.
+* **Bilingual Visual Feedback**: Displays the transcription alongside an adaptive confirmation message (*"Vous avez dit or you said : ..."*).
+
+---
+
+## Prerequisites & Installation
+
+To run this script successfully, you must install the `SpeechRecognition` library and ensure your system is configured to access an external microphone.
+
+### 1. System Audio Dependencies
+Depending on your Operating System, you may need to install system-level audio bindings (`PyAudio`) to grant Python access to your physical microphone:
+
+* **Windows**: PyAudio usually installs automatically via `pip`.
+* **macOS**: Requires PortAudio before running pip setup:
+  ```bash
+  brew install portaudio
+  ```
+* **Linux (Ubuntu/Debian)**: Requires system development tools:
+  ```bash
+  sudo apt-get install portaudio19-dev python3-pyaudio
+  ```
+
+### 2. Python Packages Installation
+Install the necessary requirements by running the following command in your terminal:
+
+```bash
+pip install SpeechRecognition PyAudio
+```
+
+---
+
+## How to Run
+
+1. Connect a functional microphone to your computer.
+2. Open your terminal or command prompt in the folder containing the script.
+3. Launch the application:
+
+```bash
+python speech_to_text.py
+```
+
+4. When the console prints **"Parlez maintenant..."**, speak clearly into your microphone in French. The script will automatically output your transcription.
+
+
+
+
+
