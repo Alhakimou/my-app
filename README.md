@@ -4,9 +4,6 @@ Remarque Anglais_to_french1 is more advanced than Anglais_to_french
 ..................................................................
 ...................................................................
 
-Credit_System
-It is a Python module that allows you to calculate your payment when you take a loan with an interest rate over several years.
-This module works well; just copy and paste.
 
 Translate in french
 
@@ -51,6 +48,65 @@ lorsque vous prenez un credit avec taut d'interet sur des années
 ce module marche bien juste copie coller
 ..................................................................
 ...................................................................
+Credit_System
+It is a Python module that allows you to calculate your payment when you take a loan with an interest rate over several years.
+This module works well; just copy and paste.
+
+
+
+# 🏦 Credit System Payment Calculator
+
+A Python graphical user interface (GUI) application to calculate annual credit payments (loan amortization) based on the total borrowed amount, interest rate, and loan duration.
+
+## 📋 Features
+* **Automatic Calculation:** Instantly calculates the fixed annual payment.
+* **Graphical Interface:** Built with Tkinter for a clean and simple user experience.
+* **Result Protection:** The output text field is locked to prevent accidental modifications.
+
+## 🧮 Amortization Formula
+The application uses the following mathematical formula to determine the fixed payments:
+$$f = \frac{c \cdot (p^{c2}) \cdot (p - 1)}{p^{c2} - 1}$$
+* Where $c$ is the total credit, $c2$ is the duration in years, and $p = 1 + \frac{\text{interest rate}}{100}$.
+
+---
+
+## 🛠️ Requirements & Installation
+
+This application requires **Python 3**. 
+
+### Installing Tkinter (Required Library)
+The application relies on the **Tkinter** library for its graphical interface. Tkinter usually comes pre-installed with standard Python setups. If you get a `ModuleNotFoundError`, install it using your system package manager:
+
+* **Windows / macOS:** Tkinter is included automatically with the official Python installer. No action needed.
+* **Linux (Ubuntu/Debian):** Run the following command in your terminal:
+  ```bash
+  sudo apt-get install python3-tk
+  ```
+
+---
+
+## 🚀 How to Run the Code
+
+1. Download or locate your script file: `Credit_system3.py`.
+2. Open your terminal or command prompt.
+3. Navigate to the folder where the file is saved.
+4. Run the script using Python:
+   ```bash
+   python Credit_system3.py
+   ```
+
+---
+
+## 💡 How to Use the Application
+
+1. Enter the **Total Credit** in USD dollars in the first input box.
+2. Enter the **Credit Interest Rate** (as a percentage, e.g., `5` for 5%) in the second box.
+3. Enter the **Credit Duration** (number of years) in the third box.
+4. Click the **"Somme annuel à payer!"** button to view your calculated annual payment.
+5. Click **"Quitter program"** to close the application.
+
+
+
 
 Test_thread
 Test_thread.py is python code help you to run your first thread just copy and paste The thread allow to create a lot of functions which run parallel not by sequence.
