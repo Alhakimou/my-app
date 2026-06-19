@@ -119,3 +119,63 @@ Significance: This demonstrates the fundamental logic of data encoding and prepr
 Features: Symmetric encoding/decoding, O(1) lookup complexity using hash maps (dictionaries).
 
 
+
+
+Cybersecurity by using crypto4.py code 
+
+
+# Text ↔ Numeric Converter (GUI)
+
+A Python-based desktop application built with Tkinter that provides a customizable text-to-numeric and numeric-to-text substitution system. This tool allows users to map letters and special characters to unique numeric codes, facilitating simple data encoding and decoding.
+
+## Features
+
+* **Custom Character Mapping**: Define your own cryptographic rules by mapping 34 characters (letters, spaces, and accented characters) to custom numeric values.
+* **Bi-directional Conversion**: Easily convert raw string text into formatted numbers and back into human-readable text.
+* **Clipboard Automation**: Dedicated functional buttons to instantly copy conversion outputs or paste results back into the input field for continuous testing.
+* **Clean Graphic User Interface**: Organized layout featuring color-coded buttons and custom typography.
+
+---
+
+## Prerequisites & Installation
+
+To run this application, you only need an operational Python environment. The interface uses standard built-in libraries.
+
+### 1. System Dependencies (Linux Users Only)
+If you are running this code on a Linux distribution (e.g., Ubuntu/Debian), you might need to install the Python Tkinter system package manually:
+
+```bash
+sudo apt-get install python3-tk
+```
+*(Windows and macOS users can skip this step as Tkinter comes pre-installed with Python).*
+
+### 2. Python Requirements
+No external `pip` packages are required. You can document your project dependencies by adding a `requirements.txt` file containing an empty structural note or simply stating:
+
+```text
+# Built-in Python Standard Libraries Only (No pip packages required)
+```
+
+---
+
+## How to Run
+
+1. Clone or download this repository to your local machine.
+2. Open your terminal or command prompt in the directory containing the file.
+3. Execute the script using Python:
+
+```bash
+python converter.py
+```
+
+---
+
+## How to Use
+
+1. **Initialize Mappings**: Upon launching, the interface loads a default 3-digit mapping system (e.g., `a=001`, `b=002`, `space=000`). Click **"Enregistrer Mappings"** to register the layout.
+2. **Text to Chiffres**: Type a sentence in the input field (yellow box) and click **"Texte → Chiffres"**. The numeric code will display in the result section below.
+3. **Chiffres to Texte**: Paste space-separated numbers into the input field and click **"Chiffres → Texte"** to reverse the process and retrieve the original text.
+
+
+
+
